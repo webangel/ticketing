@@ -5,13 +5,7 @@ import java.time.LocalDateTime;
 
 import com.scalar.ticketing.app.springboot_crud.domain.model.enums.EventStatus;
 
-import lombok.Getter;
-import lombok.ToString;
-
-@Getter
-@ToString
 public class Event {
-
 
     private final String eventId;
     private final String name;
@@ -21,10 +15,13 @@ public class Event {
     private final int availableSeats;
     private final EventStatus status;
     private final BigDecimal price;
+    private final String image;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
-    // 🔒 Constructor privado: evita instanciación directa
     private Event(String eventId, String name, LocalDateTime eventDate, Long venueId,
-                  int totalSeats, int availableSeats, EventStatus status, BigDecimal price) {
+                  int totalSeats, int availableSeats, EventStatus status, BigDecimal price,
+                  String image, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.eventId = eventId;
         this.name = name;
         this.eventDate = eventDate;
@@ -33,11 +30,26 @@ public class Event {
         this.availableSeats = availableSeats;
         this.status = status;
         this.price = price;
+        this.image = image;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    // 🏗️ Método de fábrica estático con validaciones
+    public String getEventId() { return eventId; }
+    public String getName() { return name; }
+    public LocalDateTime getEventDate() { return eventDate; }
+    public Long getVenueId() { return venueId; }
+    public int getTotalSeats() { return totalSeats; }
+    public int getAvailableSeats() { return availableSeats; }
+    public EventStatus getStatus() { return status; }
+    public BigDecimal getPrice() { return price; }
+    public String getImage() { return image; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+
     public static Event create(String name, LocalDateTime eventDate, Long venueId,
-                               int totalSeats, int availableSeats, EventStatus status, BigDecimal price) {
+                               int totalSeats, int availableSeats, EventStatus status,
+                               BigDecimal price, String image) {
 
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("El nombre del evento es obligatorio");
@@ -67,10 +79,11 @@ public class Event {
             status = EventStatus.DRAFT;
         }
 
-        return new Event(null, name, eventDate, venueId, totalSeats, availableSeats, status, price);
+        LocalDateTime now = LocalDateTime.now();
+        return new Event(null, name, eventDate, venueId, totalSeats, availableSeats, status,
+                        price, image, now, now);
     }
 
-    // 🔁 Método de actualización inmutable
     public Event updateWith(Event other) {
         return new Event(
             this.eventId,
@@ -80,11 +93,13 @@ public class Event {
             other.totalSeats != 0 ? other.totalSeats : this.totalSeats,
             other.availableSeats != 0 ? other.availableSeats : this.availableSeats,
             other.status != null ? other.status : this.status,
-            other.price != null ? other.price : this.price
+            other.price != null ? other.price : this.price,
+            other.image != null ? other.image : this.image,
+            this.createdAt,
+            LocalDateTime.now()
         );
     }
 
-    // 🎟️ Lógica de negocio: reducir disponibilidad
     public Event reduceAvailability() {
         if (this.availableSeats <= 0) {
             throw new IllegalStateException("No hay entradas disponibles para el evento: " + this.name);
@@ -97,12 +112,17 @@ public class Event {
             this.totalSeats,
             this.availableSeats - 1,
             this.status,
-            this.price
+            this.price,
+            this.image,
+            this.createdAt,
+            LocalDateTime.now()
         );
     }
 
     public static Event reconstruct(String eventId, String name, LocalDateTime eventDate, Long venueId,
-                                    int totalSeats, int availableSeats, EventStatus status, BigDecimal price) {
-        return new Event(eventId, name, eventDate, venueId, totalSeats, availableSeats, status, price);
+                                    int totalSeats, int availableSeats, EventStatus status, BigDecimal price,
+                                    String image, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        return new Event(eventId, name, eventDate, venueId, totalSeats, availableSeats, status,
+                        price, image, createdAt, updatedAt);
     }
 }

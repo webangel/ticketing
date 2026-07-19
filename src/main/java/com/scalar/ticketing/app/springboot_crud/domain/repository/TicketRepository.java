@@ -12,4 +12,8 @@ public interface TicketRepository {
     List<Ticket> findAllByStatusOrderByCreatedAt(Status status);
     long countByStatus(Status status);
     int countByEventIdAndStatus(String eventId, Status inQueue);
+    List<Ticket> findByEventId(String eventId);
+    List<Ticket> findByUserId(String userId);
+    List<Ticket> findByUserIdAndStatus(String userId, Status status);
+    boolean existsByEventId(String eventId);
 }

@@ -13,4 +13,5 @@ public interface EventService {
     Optional<EventResponseDTO> updateEvent(String eventId, EventRequestDTO eventRequest);
     boolean deleteEvent(String eventId);
     EventResponseDTO reduceAvailability(String eventId);
+    boolean hasTickets(String eventId);
 }

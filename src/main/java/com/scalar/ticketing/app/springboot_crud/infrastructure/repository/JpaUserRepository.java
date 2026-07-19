@@ -29,47 +29,63 @@ public class JpaUserRepository implements UserRepository{
         entity.setRole(user.getRole());
 
         var saved = springRepo.save(entity);
-        return User.builder()
-                .userId(saved.getUserId())
-                .name(saved.getName())
-                .email(saved.getEmail())
-                .password(saved.getPassword())
-                .role(saved.getRole())
-                .build();
+        return new User(
+                saved.getUserId(),
+                saved.getEmail(),
+                saved.getName(),
+                saved.getPassword(),
+                saved.getRole(),
+                saved.getCreatedAt(),
+                saved.getUpdatedAt()
+        );
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
         return springRepo.findByEmail(email)
-                .map(e -> User.builder()
-                        .userId(e.getUserId())
-                        .name(e.getName())
-                        .email(e.getEmail())
-                        .password(e.getPassword())
-                        .role(e.getRole())
-                        .build());
+                .map(e -> new User(
+                        e.getUserId(),
+                        e.getEmail(),
+                        e.getName(),
+                        e.getPassword(),
+                        e.getRole(),
+                        e.getCreatedAt(),
+                        e.getUpdatedAt()
+                ));
     }
 
     @Override
     public List<User> findAll() {
          return springRepo.findAll().stream()
-                .map(e -> User.builder()
-                        .userId(e.getUserId())
-                        .name(e.getName())
-                        .email(e.getEmail())
-                        .password(e.getPassword())
-                        .role(e.getRole())
-                        .build())
+                .map(e -> new User(
+                        e.getUserId(),
+                        e.getEmail(),
+                        e.getName(),
+                        e.getPassword(),
+                        e.getRole(),
+                        e.getCreatedAt(),
+                        e.getUpdatedAt()
+                ))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<User> findById(String userId) {
-         try {
-             return Optional.empty();
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving ticket", e);
-        }
+        return springRepo.findById(userId)
+                .map(e -> new User(
+                        e.getUserId(),
+                        e.getEmail(),
+                        e.getName(),
+                        e.getPassword(),
+                        e.getRole(),
+                        e.getCreatedAt(),
+                        e.getUpdatedAt()
+                ));
+    }
+
+    @Override
+    public void deleteById(String userId) {
+        springRepo.deleteById(userId);
     }
     
 }
