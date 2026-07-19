@@ -64,9 +64,37 @@ public class JpaTicketRepository implements TicketRepository {
     }
 
     @Override
-    public int countByEventIdAndStatus(String eventId, Status inQueue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'countByEventIdAndStatus'");
+    public int countByEventIdAndStatus(String eventId, Status status) {
+        return springDataTicketRepository.countByEvent_EventIdAndStatus(eventId, status);
+    }
+
+    @Override
+    public List<Ticket> findByEventId(String eventId) {
+        return springDataTicketRepository.findByEvent_EventId(eventId)
+                .stream()
+                .map(TicketEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Ticket> findByUserId(String userId) {
+        return springDataTicketRepository.findByUser_UserId(userId)
+                .stream()
+                .map(TicketEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Ticket> findByUserIdAndStatus(String userId, Status status) {
+        return springDataTicketRepository.findByUser_UserIdAndStatus(userId, status)
+                .stream()
+                .map(TicketEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean existsByEventId(String eventId) {
+        return springDataTicketRepository.existsByEvent_EventId(eventId);
     }
 
 }

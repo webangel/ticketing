@@ -1,0 +1,36 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: ticketing-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ticketing_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: ticketing-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ticketing_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      JWT_SECRET: DwkdopIDAISOPDQWD59AS8D9AWD2ASD9sd59qwd
+      JWT_EXPIRATION_MS: "86400000"
+      APP_PDF_OUTPUT_DIRECTORY: /app/pdf-tickets
+      APP_EMAIL_ENABLED: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql-data:

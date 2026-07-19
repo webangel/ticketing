@@ -8,13 +8,14 @@ import com.scalar.ticketing.app.springboot_crud.domain.model.enums.EventStatus;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record EventRequestDTO(
     @NotBlank(message = "El nombre del evento es obligatorio")
     String name,
 
-    @FutureOrPresent(message = "La fecha del evento no puede ser anterior a hoy")
+    @NotNull(message = "La fecha del evento es obligatoria")
     @FutureOrPresent(message = "La fecha del evento no puede ser anterior a hoy")
     LocalDateTime eventDate,
 
@@ -28,5 +29,10 @@ public record EventRequestDTO(
     int availableSeats,
 
     EventStatus status,
-    BigDecimal price
+
+    @NotNull(message = "El precio es obligatorio")
+    @Positive(message = "El precio debe ser mayor a 0")
+    BigDecimal price,
+
+    String image
 ) {}

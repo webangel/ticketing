@@ -1,0 +1,14 @@
+target/
+.git/
+.github/
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+app.log
+app-err.log
+login.json
+pdf-tickets/
+*.md
+!README.md

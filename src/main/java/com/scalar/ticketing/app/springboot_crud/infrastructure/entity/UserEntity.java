@@ -1,6 +1,6 @@
 package com.scalar.ticketing.app.springboot_crud.infrastructure.entity;
 
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +13,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,31 +34,54 @@ public class UserEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
     @Column(name = "password", nullable = false)
     private String password;
+
     @Column(name = "role", nullable = false)
     private UserRole role;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TicketEntity> tickets = new ArrayList<>();
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     public User toDomain() {
-        return User.builder()
-                .userId(this.userId)
-                .name(this.name)
-                .email(this.email)
-                .password(this.password)
-                .role(this.role)
-                .build();
+        return new User(
+                this.userId,
+                this.email,
+                this.name,
+                this.password,
+                this.role,
+                this.createdAt,
+                this.updatedAt
+        );
     }
-       public static UserEntity fromDomain(User user) {
+
+    public static UserEntity fromDomain(User user) {
         return UserEntity.builder()
                 .userId(user.getUserId())
                 .name(user.getName())
                 .email(user.getEmail())
-                .password(user.getPassword()) // Usar el enum directamente
+                .password(user.getPassword())
                 .role(user.getRole())
                 .build();
     }

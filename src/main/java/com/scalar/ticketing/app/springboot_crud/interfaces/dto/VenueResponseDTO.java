@@ -2,13 +2,12 @@ package com.scalar.ticketing.app.springboot_crud.interfaces.dto;
 
 import java.time.LocalDateTime;
 
-import com.scalar.ticketing.app.springboot_crud.domain.model.enums.UserRole;
-
-public record UserResponseDTO(
-    String userId,
+public record VenueResponseDTO(
+    Long venueId,
     String name,
-    String email,
-    UserRole role,
+    String address,
+    int capacity,
+    String layout,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}

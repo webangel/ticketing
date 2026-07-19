@@ -21,6 +21,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,27 +64,29 @@ public class EventEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<TicketEntity> tickets = new ArrayList<>();
 
-    // public void addTicket(TicketEntity ticket) {
-    //     this.tickets.add(ticket);
-    //     ticket.setEvent(this); // Mantiene la relación en ambos lados
-    // }
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
-    //     public static EventEntity fromDomain(Event event, VenueEntity venueEntity) {
-    //     return EventEntity.builder()
-    //             .eventId(event.getEventId())
-    //             .name(event.getName())
-    //             .eventDate(event.getEventDate())
-    //             .venue(venueEntity)
-    //             .totalSeats(event.getTotalSeats())
-    //             .availableSeats(event.getAvailableSeats())
-    //             .status(event.getStatus())
-    //             .price(event.getPrice())
-    //             .build();
-    // }
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     public static EventEntity fromDomain(Event event, VenueEntity venueEntity) {
         EventEntity entity = new EventEntity();
@@ -94,32 +98,24 @@ public class EventEntity {
         entity.setAvailableSeats(event.getAvailableSeats());
         entity.setStatus(event.getStatus());
         entity.setPrice(event.getPrice());
+        entity.setImage(event.getImage());
         return entity;
     }
 
-    // public Event toDomain() {
-    //     return Event.reconstruct(
-    //         this.eventId,
-    //         this.name,
-    //         this.eventDate,
-    //         this.venue.getVenueId(),
-    //         this.totalSeats,
-    //         this.availableSeats,
-    //         this.status,
-    //         this.price
-    //     );
-    // }
-
     public Event toDomain() {
+        Long venueId = this.getVenue() != null ? this.getVenue().getVenueId() : null;
         return Event.reconstruct(
             this.getEventId(), 
             this.getName(), 
             this.getEventDate(), 
-            this.getVenue().getVenueId(), 
+            venueId, 
             this.getTotalSeats(),  
             this.getAvailableSeats(), 
             this.getStatus(), 
-            this.getPrice()
+            this.getPrice(),
+            this.getImage(),
+            this.getCreatedAt(),
+            this.getUpdatedAt()
             );
     }
 }
